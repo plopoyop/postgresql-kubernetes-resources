@@ -1,0 +1,101 @@
+---
+name: Release Charts
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+
+jobs:
+  postgresql-instance:
+    name: Release postgresql-instance chart
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Configure Git
+        run: |
+          git config user.name "$GITHUB_ACTOR"
+          git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
+          git config --global --add safe.directory $GITHUB_WORKSPACE
+
+      - name: Get Previous tag
+        id: previous_tag
+        uses: WyriHaximus/github-action-get-previous-tag@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Calculate next version
+        id: version
+        uses: patrickjahns/version-drafter-action@v1
+        with:
+          config-name: version-drafter.yml
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Check if tag exists
+        id: tag_exists
+        run: |
+          TAG_EXISTS=false
+          if git tag -l | grep -E "^${{ steps.version.outputs.next-version }}$" > /dev/null; then
+            TAG_EXISTS=true
+          fi
+          echo "exists=$TAG_EXISTS" >> $GITHUB_OUTPUT
+
+      - name: Skip if no new release
+        if: steps.tag_exists.outputs.exists == 'true'
+        run: |
+          echo "Tag ${{ steps.version.outputs.next-version }} already exists, skipping release"
+          exit 0
+
+      - name: Generate changelog
+        if: steps.tag_exists.outputs.exists != 'true'
+        uses: janheinrichmerker/action-github-changelog-generator@v2.4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          configureSections: '{"features": {"prefix":"## 🚀 New Features","labels":["feature", "enhancement", "improvements"]}, "bugs": {"prefix":"## 🐛 Bug Fixes","labels":["fix", "bug", "bugfix"]}, "tests": {"prefix":"## 🧪 Tests","labels":["test"]}, "documentation": {"prefix":"## 📖 Documentation Updates","labels":["docs", "documentation", "doc"]}, "dependency": {"prefix":"## ⚙️ Dependencies","labels":["dependency"]}}'
+          futureRelease: ${{ steps.version.outputs.next-version }}
+
+      - name: Commit CHANGELOG.md
+        if: steps.tag_exists.outputs.exists != 'true'
+        uses: github-actions-x/commit@v2.9
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          push-branch: main
+          commit-message: "chore: release ${{ steps.version.outputs.next-version }}"
+          force-add: "true"
+          files: CHANGELOG.md
+          name: CI
+          email: ${{ github.actor }}@users.noreply.github.com
+
+      - name: Create and push tag
+        if: steps.tag_exists.outputs.exists != 'true'
+        run: |
+          git tag -a "${{ steps.version.outputs.next-version }}" -m "Release ${{ steps.version.outputs.next-version }}"
+          git push origin "${{ steps.version.outputs.next-version }}"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract changelog for release body
+        if: steps.tag_exists.outputs.exists != 'true'
+        id: changelog_body
+        run: |
+          sed "/## \[${{ steps.previous_tag.outputs.tag }}\]/Q" CHANGELOG.md | head -n -1 > release_changelog.md
+          echo "body<<EOF" >> $GITHUB_OUTPUT
+          cat release_changelog.md >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Create release
+        if: steps.tag_exists.outputs.exists != 'true'
+        uses: ncipollo/release-action@v1
+        with:
+          tag: ${{ steps.version.outputs.next-version }}
+          name: ${{ steps.version.outputs.next-version }}
+          body: ${{ steps.changelog_body.outputs.body }}
+          draft: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

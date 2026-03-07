@@ -1,0 +1,153 @@
+name: example-postgresql
+teamId: "acid"
+numberOfInstances: 2
+version: "18"
+
+users:
+  admin:
+    - superuser
+    - createdb
+
+databases:
+  app: admin
+
+preparedDatabases: {}
+#  bar:
+#    defaultUsers: true
+#    extensions:
+#      pg_partman: public
+#      pgcrypto: public
+#    schemas:
+#      data: {}
+#      history:
+#        defaultRoles: true
+#        defaultUsers: false
+
+postgresql:
+  parameters: {}
+#    shared_buffers: "32MB"
+#    max_connections: "100"
+#    log_statement: "all"
+
+volume:
+  size: 1Gi
+#  storageClass: ""
+#  iops: 1000
+#  throughput: 250
+
+additionalVolumes: []
+#  - name: empty
+#    mountPath: /opt/empty
+#    targetContainers:
+#      - all
+#    volumeSource:
+#      emptyDir: {}
+
+enableShmVolume: true
+
+resources:
+  requests:
+    cpu: 10m
+    memory: 100Mi
+  limits:
+    cpu: 500m
+    memory: 500Mi
+
+patroni:
+  failsafe_mode: false
+  initdb:
+    encoding: "UTF8"
+    locale: "en_US.UTF-8"
+    data-checksums: "true"
+  ttl: 30
+  loop_wait: 10
+  retry_timeout: 10
+  synchronous_mode: false
+  synchronous_mode_strict: false
+  synchronous_node_count: 1
+  maximum_lag_on_failover: 33554432
+#  pg_hba: []
+#  slots: {}
+
+enableMasterLoadBalancer: false
+enableReplicaLoadBalancer: false
+
+enableConnectionPooler: false
+enableReplicaConnectionPooler: false
+enableMasterPoolerLoadBalancer: false
+enableReplicaPoolerLoadBalancer: false
+
+connectionPooler: {}
+#  numberOfInstances: 2
+#  mode: "transaction"
+#  schema: "pooler"
+#  user: "pooler"
+#  maxDBConnections: 60
+#  resources:
+#    requests:
+#      cpu: 300m
+#      memory: 100Mi
+#    limits:
+#      cpu: "1"
+#      memory: 100Mi
+
+allowedSourceRanges: []
+#  - 127.0.0.1/32
+
+tls:
+  secretName: ""
+  certificateFile: "tls.crt"
+  privateKeyFile: "tls.key"
+  caFile: ""
+  caSecretName: ""
+
+enableLogicalBackup: false
+logicalBackupSchedule: "30 00 * * *"
+#logicalBackupRetention: "3 months"
+
+initContainers: []
+#  - name: date
+#    image: busybox
+#    command: [ "/bin/date" ]
+
+sidecars: []
+#  - name: "telegraf-sidecar"
+#    image: "telegraf:latest"
+#    ports:
+#      - name: metrics
+#        containerPort: 8094
+#        protocol: TCP
+#    resources:
+#      limits:
+#        cpu: 500m
+#        memory: 500Mi
+#      requests:
+#        cpu: 100m
+#        memory: 100Mi
+
+podAnnotations: {}
+serviceAnnotations: {}
+podPriorityClassName: ""
+tolerations: []
+nodeAffinity: {}
+
+#dockerImage: ghcr.io/zalando/spilo-18:4.1-p1
+
+env: []
+#  - name: wal_s3_bucket
+#    value: my-custom-bucket
+
+# PostgresTeam CRD resources
+# Maps team IDs to additional members, teams, and superuser teams
+postgresTeams: []
+#  - name: acid-team
+#    additionalMembers:
+#      acid:
+#        - extra-user1
+#        - extra-user2
+#    additionalTeams:
+#      acid:
+#        - partner-team
+#    additionalSuperuserTeams:
+#      acid:
+#        - dba-team

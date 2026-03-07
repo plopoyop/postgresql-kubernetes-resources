@@ -1,0 +1,15 @@
+---
+suite: resources contains metadata
+templates:
+  - postgresql.yaml
+tests:
+  - it: "should contains labels metadata"
+    asserts:
+      - isNotEmpty:
+          path: metadata.labels
+      - isSubset:
+          path: metadata.labels
+          content:
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/managed-by: Helm
+            app.kubernetes.io/name: postgresql-instance

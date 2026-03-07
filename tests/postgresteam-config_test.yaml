@@ -1,0 +1,133 @@
+---
+suite: PostgresTeam configuration
+templates:
+  - postgresteam.yaml
+tests:
+  - it: should not generate any resource by default
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: should generate a single PostgresTeam resource
+    set:
+      postgresTeams:
+        - name: acid-team
+          additionalMembers:
+            acid:
+              - user1
+              - user2
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: PostgresTeam
+      - equal:
+          path: apiVersion
+          value: "acid.zalan.do/v1"
+      - equal:
+          path: metadata.name
+          value: acid-team
+
+  - it: should render additionalMembers
+    set:
+      postgresTeams:
+        - name: my-team
+          additionalMembers:
+            acid:
+              - extra-user1
+              - extra-user2
+    asserts:
+      - equal:
+          path: spec.additionalMembers.acid
+          value:
+            - extra-user1
+            - extra-user2
+
+  - it: should render additionalTeams
+    set:
+      postgresTeams:
+        - name: my-team
+          additionalTeams:
+            acid:
+              - partner-team
+              - ops-team
+    asserts:
+      - equal:
+          path: spec.additionalTeams.acid
+          value:
+            - partner-team
+            - ops-team
+
+  - it: should render additionalSuperuserTeams
+    set:
+      postgresTeams:
+        - name: my-team
+          additionalSuperuserTeams:
+            acid:
+              - dba-team
+    asserts:
+      - equal:
+          path: spec.additionalSuperuserTeams.acid
+          value:
+            - dba-team
+
+  - it: should render all spec fields together
+    set:
+      postgresTeams:
+        - name: full-team
+          additionalMembers:
+            acid:
+              - user1
+          additionalTeams:
+            acid:
+              - team1
+          additionalSuperuserTeams:
+            acid:
+              - su-team
+    asserts:
+      - isNotEmpty:
+          path: spec.additionalMembers
+      - isNotEmpty:
+          path: spec.additionalTeams
+      - isNotEmpty:
+          path: spec.additionalSuperuserTeams
+
+  - it: should generate multiple PostgresTeam resources
+    set:
+      postgresTeams:
+        - name: team-alpha
+          additionalMembers:
+            alpha:
+              - user1
+        - name: team-beta
+          additionalMembers:
+            beta:
+              - user2
+    asserts:
+      - hasDocuments:
+          count: 2
+      - equal:
+          path: metadata.name
+          value: team-alpha
+        documentIndex: 0
+      - equal:
+          path: metadata.name
+          value: team-beta
+        documentIndex: 1
+
+  - it: should contain labels metadata
+    set:
+      postgresTeams:
+        - name: labeled-team
+          additionalMembers:
+            acid:
+              - user1
+    asserts:
+      - isNotEmpty:
+          path: metadata.labels
+      - isSubset:
+          path: metadata.labels
+          content:
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/managed-by: Helm
+            app.kubernetes.io/name: postgresql-instance
