@@ -1,0 +1,5 @@
+.task/
+.devbox/
+
+# tests
+__snapshot__
