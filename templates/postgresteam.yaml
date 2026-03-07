@@ -1,0 +1,22 @@
+{{- range .Values.postgresTeams }}
+---
+apiVersion: "acid.zalan.do/v1"
+kind: PostgresTeam
+metadata:
+  name: {{ .name }}
+  labels:
+    {{- include "postgresql.labels" $ | nindent 4 }}
+spec:
+{{- if .additionalMembers }}
+  additionalMembers:
+    {{- toYaml .additionalMembers | nindent 4 }}
+{{- end }}
+{{- if .additionalTeams }}
+  additionalTeams:
+    {{- toYaml .additionalTeams | nindent 4 }}
+{{- end }}
+{{- if .additionalSuperuserTeams }}
+  additionalSuperuserTeams:
+    {{- toYaml .additionalSuperuserTeams | nindent 4 }}
+{{- end }}
+{{- end }}

@@ -1,0 +1,135 @@
+---
+apiVersion: "acid.zalan.do/v1"
+kind: postgresql
+metadata:
+  name: {{ .Values.name }}
+  labels:
+    {{- include "postgresql.labels" . | nindent 4 }}
+spec:
+{{- if .Values.dockerImage }}
+  dockerImage: {{ .Values.dockerImage }}
+{{- end }}
+  teamId: {{ .Values.teamId | quote }}
+  numberOfInstances: {{ .Values.numberOfInstances }}
+
+  users:
+    {{- toYaml .Values.users | nindent 4 }}
+
+  enableMasterLoadBalancer: {{ .Values.enableMasterLoadBalancer }}
+  enableReplicaLoadBalancer: {{ .Values.enableReplicaLoadBalancer }}
+  enableConnectionPooler: {{ .Values.enableConnectionPooler }}
+  enableReplicaConnectionPooler: {{ .Values.enableReplicaConnectionPooler }}
+  enableMasterPoolerLoadBalancer: {{ .Values.enableMasterPoolerLoadBalancer }}
+  enableReplicaPoolerLoadBalancer: {{ .Values.enableReplicaPoolerLoadBalancer }}
+
+{{- if .Values.allowedSourceRanges }}
+  allowedSourceRanges:
+    {{- toYaml .Values.allowedSourceRanges | nindent 4 }}
+{{- end }}
+
+{{- if .Values.databases }}
+  databases:
+    {{- toYaml .Values.databases | nindent 4 }}
+{{- end }}
+
+{{- if .Values.preparedDatabases }}
+  preparedDatabases:
+    {{- toYaml .Values.preparedDatabases | nindent 4 }}
+{{- end }}
+
+  postgresql:
+    version: {{ .Values.version | quote }}
+{{- if .Values.postgresql.parameters }}
+    parameters:
+      {{- toYaml .Values.postgresql.parameters | nindent 6 }}
+{{- end }}
+
+{{- if .Values.env }}
+  env:
+    {{- toYaml .Values.env | nindent 4 }}
+{{- end }}
+
+  volume:
+    size: {{ .Values.volume.size }}
+{{- if .Values.volume.storageClass }}
+    storageClass: {{ .Values.volume.storageClass }}
+{{- end }}
+{{- if .Values.volume.iops }}
+    iops: {{ .Values.volume.iops }}
+{{- end }}
+{{- if .Values.volume.throughput }}
+    throughput: {{ .Values.volume.throughput }}
+{{- end }}
+
+{{- if .Values.additionalVolumes }}
+  additionalVolumes:
+    {{- toYaml .Values.additionalVolumes | nindent 4 }}
+{{- end }}
+
+  enableShmVolume: {{ .Values.enableShmVolume }}
+
+{{- if .Values.podAnnotations }}
+  podAnnotations:
+    {{- toYaml .Values.podAnnotations | nindent 4 }}
+{{- end }}
+
+{{- if .Values.serviceAnnotations }}
+  serviceAnnotations:
+    {{- toYaml .Values.serviceAnnotations | nindent 4 }}
+{{- end }}
+
+{{- if .Values.podPriorityClassName }}
+  podPriorityClassName: {{ .Values.podPriorityClassName | quote }}
+{{- end }}
+
+{{- if .Values.tolerations }}
+  tolerations:
+    {{- toYaml .Values.tolerations | nindent 4 }}
+{{- end }}
+
+  resources:
+    {{- toYaml .Values.resources | nindent 4 }}
+
+  patroni:
+    {{- toYaml .Values.patroni | nindent 4 }}
+
+{{- if not (empty .Values.connectionPooler) }}
+  connectionPooler:
+    {{- toYaml .Values.connectionPooler | nindent 4 }}
+{{- end }}
+
+{{- if .Values.enableLogicalBackup }}
+  enableLogicalBackup: true
+  logicalBackupSchedule: {{ .Values.logicalBackupSchedule | quote }}
+{{- if .Values.logicalBackupRetention }}
+  logicalBackupRetention: {{ .Values.logicalBackupRetention | quote }}
+{{- end }}
+{{- end }}
+
+{{- if .Values.initContainers }}
+  initContainers:
+    {{- toYaml .Values.initContainers | nindent 4 }}
+{{- end }}
+
+{{- if .Values.sidecars }}
+  sidecars:
+    {{- toYaml .Values.sidecars | nindent 4 }}
+{{- end }}
+
+{{- if .Values.tls.secretName }}
+  tls:
+    secretName: {{ .Values.tls.secretName }}
+    certificateFile: {{ .Values.tls.certificateFile }}
+    privateKeyFile: {{ .Values.tls.privateKeyFile }}
+{{- if .Values.tls.caFile }}
+    caFile: {{ .Values.tls.caFile }}
+{{- end }}
+{{- if .Values.tls.caSecretName }}
+    caSecretName: {{ .Values.tls.caSecretName }}
+{{- end }}
+{{- end }}
+
+{{- if .Values.nodeAffinity }}
+  nodeAffinity:
+    {{- toYaml .Values.nodeAffinity | nindent 4 }}
+{{- end }}

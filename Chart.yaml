@@ -1,0 +1,14 @@
+apiVersion: v2
+name: postgresql-instance
+description: Deploy and manage a PostgreSQL cluster on Kubernetes using the Zalando Postgres Operator.
+type: application
+keywords:
+  - postgresql
+  - database
+  - sql
+  - kubernetes
+  - operator
+  - zalando
+icon: https://wiki.postgresql.org/images/a/a4/PostgreSQL_logo.3colors.svg
+version: "0.1.0"
+appVersion: "18"
