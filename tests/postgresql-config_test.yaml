@@ -1,0 +1,380 @@
+---
+suite: PostgreSQL cluster configuration
+templates:
+  - postgresql.yaml
+tests:
+  - it: should provide expected defaults
+    asserts:
+      - equal:
+          path: apiVersion
+          value: "acid.zalan.do/v1"
+      - equal:
+          path: kind
+          value: postgresql
+      - equal:
+          path: spec.teamId
+          value: "acid"
+      - equal:
+          path: spec.numberOfInstances
+          value: 2
+      - equal:
+          path: spec.postgresql.version
+          value: "18"
+      - equal:
+          path: spec.volume.size
+          value: 1Gi
+      - equal:
+          path: spec.enableShmVolume
+          value: true
+      - equal:
+          path: spec.enableMasterLoadBalancer
+          value: false
+      - equal:
+          path: spec.enableReplicaLoadBalancer
+          value: false
+      - equal:
+          path: spec.enableConnectionPooler
+          value: false
+      - equal:
+          path: spec.enableReplicaConnectionPooler
+          value: false
+
+  - it: should have default users and databases
+    asserts:
+      - equal:
+          path: spec.users.admin
+          value:
+            - superuser
+            - createdb
+      - equal:
+          path: spec.databases.app
+          value: admin
+
+  - it: should have default resources
+    asserts:
+      - equal:
+          path: spec.resources
+          value:
+            requests:
+              cpu: 10m
+              memory: 100Mi
+            limits:
+              cpu: 500m
+              memory: 500Mi
+
+  - it: should have default patroni config
+    asserts:
+      - equal:
+          path: spec.patroni.failsafe_mode
+          value: false
+      - equal:
+          path: spec.patroni.initdb.encoding
+          value: "UTF8"
+      - equal:
+          path: spec.patroni.ttl
+          value: 30
+      - equal:
+          path: spec.patroni.synchronous_mode
+          value: false
+
+  - it: should set custom number of instances
+    set:
+      numberOfInstances: 5
+    asserts:
+      - equal:
+          path: spec.numberOfInstances
+          value: 5
+
+  - it: should set custom version
+    set:
+      version: "16"
+    asserts:
+      - equal:
+          path: spec.postgresql.version
+          value: "16"
+
+  - it: should set custom volume configuration
+    set:
+      volume:
+        size: 50Gi
+        storageClass: fast-ssd
+        iops: 3000
+        throughput: 500
+    asserts:
+      - equal:
+          path: spec.volume.size
+          value: 50Gi
+      - equal:
+          path: spec.volume.storageClass
+          value: fast-ssd
+      - equal:
+          path: spec.volume.iops
+          value: 3000
+      - equal:
+          path: spec.volume.throughput
+          value: 500
+
+  - it: should set postgresql parameters
+    set:
+      postgresql:
+        parameters:
+          shared_buffers: "256MB"
+          max_connections: "200"
+    asserts:
+      - equal:
+          path: spec.postgresql.parameters.shared_buffers
+          value: "256MB"
+      - equal:
+          path: spec.postgresql.parameters.max_connections
+          value: "200"
+
+  - it: should set custom users and databases
+    set:
+      users:
+        app_user:
+          - createdb
+        readonly_user: []
+      databases:
+        mydb: app_user
+        analytics: readonly_user
+    asserts:
+      - equal:
+          path: spec.users.app_user
+          value:
+            - createdb
+      - isEmpty:
+          path: spec.users.readonly_user
+      - equal:
+          path: spec.databases.mydb
+          value: app_user
+      - equal:
+          path: spec.databases.analytics
+          value: readonly_user
+
+  - it: should configure prepared databases
+    set:
+      preparedDatabases:
+        myapp:
+          defaultUsers: true
+          extensions:
+            pgcrypto: public
+          schemas:
+            data: {}
+    asserts:
+      - equal:
+          path: spec.preparedDatabases.myapp.defaultUsers
+          value: true
+      - equal:
+          path: spec.preparedDatabases.myapp.extensions.pgcrypto
+          value: public
+
+  - it: should enable load balancers
+    set:
+      enableMasterLoadBalancer: true
+      enableReplicaLoadBalancer: true
+    asserts:
+      - equal:
+          path: spec.enableMasterLoadBalancer
+          value: true
+      - equal:
+          path: spec.enableReplicaLoadBalancer
+          value: true
+
+  - it: should configure connection pooler
+    set:
+      enableConnectionPooler: true
+      connectionPooler:
+        numberOfInstances: 3
+        mode: "transaction"
+        schema: "pooler"
+        user: "pooler"
+        maxDBConnections: 100
+    asserts:
+      - equal:
+          path: spec.enableConnectionPooler
+          value: true
+      - equal:
+          path: spec.connectionPooler.numberOfInstances
+          value: 3
+      - equal:
+          path: spec.connectionPooler.mode
+          value: "transaction"
+      - equal:
+          path: spec.connectionPooler.maxDBConnections
+          value: 100
+
+  - it: should not render connectionPooler when empty
+    asserts:
+      - notExists:
+          path: spec.connectionPooler
+
+  - it: should configure logical backup
+    set:
+      enableLogicalBackup: true
+      logicalBackupSchedule: "0 3 * * *"
+      logicalBackupRetention: "7 days"
+    asserts:
+      - equal:
+          path: spec.enableLogicalBackup
+          value: true
+      - equal:
+          path: spec.logicalBackupSchedule
+          value: "0 3 * * *"
+      - equal:
+          path: spec.logicalBackupRetention
+          value: "7 days"
+
+  - it: should not render logical backup when disabled
+    asserts:
+      - notExists:
+          path: spec.enableLogicalBackup
+      - notExists:
+          path: spec.logicalBackupSchedule
+
+  - it: should configure TLS
+    set:
+      tls:
+        secretName: "my-tls-secret"
+        certificateFile: "tls.crt"
+        privateKeyFile: "tls.key"
+        caFile: "ca.crt"
+        caSecretName: "my-ca-secret"
+    asserts:
+      - equal:
+          path: spec.tls.secretName
+          value: "my-tls-secret"
+      - equal:
+          path: spec.tls.certificateFile
+          value: "tls.crt"
+      - equal:
+          path: spec.tls.caFile
+          value: "ca.crt"
+      - equal:
+          path: spec.tls.caSecretName
+          value: "my-ca-secret"
+
+  - it: should not render TLS when secretName is empty
+    asserts:
+      - notExists:
+          path: spec.tls
+
+  - it: should set docker image
+    set:
+      dockerImage: "ghcr.io/zalando/spilo-16:3.0-p1"
+    asserts:
+      - equal:
+          path: spec.dockerImage
+          value: "ghcr.io/zalando/spilo-16:3.0-p1"
+
+  - it: should not render dockerImage by default
+    asserts:
+      - notExists:
+          path: spec.dockerImage
+
+  - it: should configure init containers
+    set:
+      initContainers:
+        - name: init-sysctl
+          image: busybox
+          command: ["sysctl", "-w", "vm.max_map_count=262144"]
+    asserts:
+      - equal:
+          path: spec.initContainers[0].name
+          value: "init-sysctl"
+
+  - it: should configure sidecars
+    set:
+      sidecars:
+        - name: exporter
+          image: "wrouesnel/postgres_exporter:latest"
+          ports:
+            - name: metrics
+              containerPort: 9187
+    asserts:
+      - equal:
+          path: spec.sidecars[0].name
+          value: "exporter"
+      - equal:
+          path: spec.sidecars[0].ports[0].containerPort
+          value: 9187
+
+  - it: should set pod annotations and tolerations
+    set:
+      podAnnotations:
+        backup: "true"
+      tolerations:
+        - key: dedicated
+          operator: Equal
+          value: postgres
+          effect: NoSchedule
+    asserts:
+      - equal:
+          path: spec.podAnnotations.backup
+          value: "true"
+      - equal:
+          path: spec.tolerations[0].key
+          value: "dedicated"
+
+  - it: should set pod priority class
+    set:
+      podPriorityClassName: "high-priority"
+    asserts:
+      - equal:
+          path: spec.podPriorityClassName
+          value: "high-priority"
+
+  - it: should configure allowed source ranges
+    set:
+      allowedSourceRanges:
+        - "10.0.0.0/8"
+        - "192.168.1.0/24"
+    asserts:
+      - equal:
+          path: spec.allowedSourceRanges
+          value:
+            - "10.0.0.0/8"
+            - "192.168.1.0/24"
+
+  - it: should set env variables
+    set:
+      env:
+        - name: wal_s3_bucket
+          value: my-bucket
+    asserts:
+      - equal:
+          path: spec.env[0].name
+          value: "wal_s3_bucket"
+      - equal:
+          path: spec.env[0].value
+          value: "my-bucket"
+
+  - it: should configure node affinity
+    set:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+            - matchExpressions:
+                - key: postgres-operator
+                  operator: In
+                  values:
+                    - enabled
+    asserts:
+      - isNotEmpty:
+          path: spec.nodeAffinity
+
+  - it: should configure additional volumes
+    set:
+      additionalVolumes:
+        - name: extra-data
+          mountPath: /opt/extra
+          targetContainers:
+            - all
+          volumeSource:
+            emptyDir: {}
+    asserts:
+      - equal:
+          path: spec.additionalVolumes[0].name
+          value: "extra-data"
+      - equal:
+          path: spec.additionalVolumes[0].mountPath
+          value: "/opt/extra"
