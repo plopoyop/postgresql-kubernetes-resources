@@ -173,51 +173,51 @@
         }
       }
     },
-    "prek@0.2.30": {
-      "last_modified": "2026-02-01T05:13:08Z",
-      "resolved": "github:NixOS/nixpkgs/207d15f1a6603226e1e223dc79ac29c7846da32e#prek",
+    "prek@0.3.0": {
+      "last_modified": "2026-02-27T06:27:13Z",
+      "resolved": "github:NixOS/nixpkgs/c0f3d81a7ddbc2b1332be0d8481a672b4f6004d6#prek",
       "source": "devbox-search",
-      "version": "0.2.30",
+      "version": "0.3.0",
       "systems": {
         "aarch64-darwin": {
           "outputs": [
             {
               "name": "out",
-              "path": "/nix/store/l4a2m16q0cqirnkpx7zjbprsz6pn3n1v-prek-0.2.30",
+              "path": "/nix/store/227icwp3g1zpw31axsg8jcq0ldxwsmyn-prek-0.3.0",
               "default": true
             }
           ],
-          "store_path": "/nix/store/l4a2m16q0cqirnkpx7zjbprsz6pn3n1v-prek-0.2.30"
+          "store_path": "/nix/store/227icwp3g1zpw31axsg8jcq0ldxwsmyn-prek-0.3.0"
         },
         "aarch64-linux": {
           "outputs": [
             {
               "name": "out",
-              "path": "/nix/store/sqmy2w55wpacciwwp2wbmn3h578nvz7z-prek-0.2.30",
+              "path": "/nix/store/dpnyq93dp3sx0h2l4dxkcxin0266pw04-prek-0.3.0",
               "default": true
             }
           ],
-          "store_path": "/nix/store/sqmy2w55wpacciwwp2wbmn3h578nvz7z-prek-0.2.30"
+          "store_path": "/nix/store/dpnyq93dp3sx0h2l4dxkcxin0266pw04-prek-0.3.0"
         },
         "x86_64-darwin": {
           "outputs": [
             {
               "name": "out",
-              "path": "/nix/store/y4rkkq2khr71i6k20rgdifhk5z22l02v-prek-0.2.30",
+              "path": "/nix/store/d26lb1m8wdqsi6nnaz298yhzja5s17d1-prek-0.3.0",
               "default": true
             }
           ],
-          "store_path": "/nix/store/y4rkkq2khr71i6k20rgdifhk5z22l02v-prek-0.2.30"
+          "store_path": "/nix/store/d26lb1m8wdqsi6nnaz298yhzja5s17d1-prek-0.3.0"
         },
         "x86_64-linux": {
           "outputs": [
             {
               "name": "out",
-              "path": "/nix/store/xx9zcag296pwb89aam25w8vfk40krk43-prek-0.2.30",
+              "path": "/nix/store/lask94lpdm3lx3bnyw6cgnzkgmlxc5vc-prek-0.3.0",
               "default": true
             }
           ],
-          "store_path": "/nix/store/xx9zcag296pwb89aam25w8vfk40krk43-prek-0.2.30"
+          "store_path": "/nix/store/lask94lpdm3lx3bnyw6cgnzkgmlxc5vc-prek-0.3.0"
         }
       }
     },
