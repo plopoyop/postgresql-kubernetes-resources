@@ -19,7 +19,7 @@ tests:
           value: 2
       - equal:
           path: spec.postgresql.version
-          value: "18"
+          value: "17"
       - equal:
           path: spec.volume.size
           value: 1Gi

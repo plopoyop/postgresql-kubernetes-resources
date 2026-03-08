@@ -11,4 +11,4 @@ keywords:
   - zalando
 icon: https://wiki.postgresql.org/images/a/a4/PostgreSQL_logo.3colors.svg
 version: "0.1.0"
-appVersion: "18"
+appVersion: "17"
