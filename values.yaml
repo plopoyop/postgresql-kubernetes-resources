@@ -1,7 +1,7 @@
 name: example-postgresql
 teamId: "acid"
 numberOfInstances: 2
-version: "18"
+version: "17"
 
 users:
   admin:
