@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.1.1](https://github.com/plopoyop/postgresql-kubernetes-resources/tree/0.1.1) (2026-03-08)
+
+[Full Changelog](https://github.com/plopoyop/postgresql-kubernetes-resources/compare/0.1.0...0.1.1)
+
+**Merged pull requests:**
+
+- feat\(deps\): update prek \(0.2.30 → 0.3.0\) [\#3](https://github.com/plopoyop/postgresql-kubernetes-resources/pull/3) ([plopoyop](https://github.com/plopoyop))
+- feat\(deps\): update git \(2.52.0 → 2.53.0\) [\#2](https://github.com/plopoyop/postgresql-kubernetes-resources/pull/2) ([plopoyop](https://github.com/plopoyop))
+
 ## [0.1.0](https://github.com/plopoyop/postgresql-kubernetes-resources/tree/0.1.0) (2026-03-07)
 
 [Full Changelog](https://github.com/plopoyop/postgresql-kubernetes-resources/compare/34408f16330e8e81da4b13ad431d52c99501d48e...0.1.0)
