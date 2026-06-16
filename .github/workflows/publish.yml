@@ -52,7 +52,7 @@ jobs:
       - name: Setup Helm
         uses: azure/setup-helm@v5
         with:
-          version: v3.21.0
+          version: v3.21.1
 
       - name: Generate default static install
         run: |
