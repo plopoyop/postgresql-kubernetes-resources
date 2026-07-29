@@ -3,13 +3,16 @@ teamId: "acid"
 numberOfInstances: 2
 version: "17"
 
+# Manifest users. Names listed in the operator's `protected_role_names`
+# ("admin" and "cron_admin" by default) cannot be used here: the operator refuses
+# to create them and silently skips the databases they own.
 users:
-  admin:
+  app_admin:
     - superuser
     - createdb
 
 databases:
-  app: admin
+  app: app_admin
 
 preparedDatabases: {}
 #  bar:
@@ -32,6 +35,7 @@ postgresql:
 volume:
   size: 1Gi
 #  storageClass: ""
+#  type: "ebs"
 #  iops: 1000
 #  throughput: 250
 
@@ -76,6 +80,17 @@ enableConnectionPooler: false
 enableReplicaConnectionPooler: false
 enableMasterPoolerLoadBalancer: false
 enableReplicaPoolerLoadBalancer: false
+
+# NodePort services. These override the load balancer configuration above.
+# Leave the port values unset to let Kubernetes pick a port.
+enableMasterNodePort: false
+enableReplicaNodePort: false
+enableMasterPoolerNodePort: false
+enableReplicaPoolerNodePort: false
+#masterNodePort: 30000
+#replicaNodePort: 30001
+#masterPoolerNodePort: 30002
+#replicaPoolerNodePort: 30003
 
 connectionPooler: {}
 #  numberOfInstances: 2
@@ -131,11 +146,46 @@ podPriorityClassName: ""
 tolerations: []
 nodeAffinity: {}
 
-#dockerImage: ghcr.io/zalando/spilo-18:4.1-p1
+topologySpreadConstraints: []
+#  - maxSkew: 1
+#    topologyKey: topology.kubernetes.io/zone
+#    whenUnsatisfiable: ScheduleAnyway
+#    labelSelector:
+#      matchLabels:
+#        application: spilo
+
+# Overrides the operator's global liveness_probe for this cluster
+livenessProbe: {}
+#  httpGet:
+#    scheme: HTTP
+#    path: /liveness
+#    port: 8008
+#  initialDelaySeconds: 10
+#  periodSeconds: 10
+#  timeoutSeconds: 5
+#  successThreshold: 1
+#  failureThreshold: 3
+
+# Stream from a remote primary or from an S3/GCS WAL archive.
+# Requires one of s3_wal_path, gs_wal_path or standby_host;
+# s3_wal_path and gs_wal_path are mutually exclusive.
+standby: {}
+#  standby_host: "acid-minimal-cluster.default"
+#  standby_port: "5432"
+#  standby_primary_slot_name: "standby_slot"
+#  s3_wal_path: "s3://mybucket/spilo/acid-minimal-cluster/abcd1234/wal/17/"
+
+#dockerImage: ghcr.io/zalando/spilo-18:4.1-p2
 
 env: []
 #  - name: wal_s3_bucket
 #    value: my-custom-bucket
+
+envFrom: []
+#  - secretRef:
+#      name: my-custom-secret
+#  - configMapRef:
+#      name: my-custom-config
 
 # PostgresTeam CRD resources
 # Maps team IDs to additional members, teams, and superuser teams

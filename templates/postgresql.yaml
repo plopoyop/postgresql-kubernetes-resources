@@ -22,6 +22,23 @@ spec:
   enableMasterPoolerLoadBalancer: {{ .Values.enableMasterPoolerLoadBalancer }}
   enableReplicaPoolerLoadBalancer: {{ .Values.enableReplicaPoolerLoadBalancer }}
 
+  enableMasterNodePort: {{ .Values.enableMasterNodePort }}
+  enableReplicaNodePort: {{ .Values.enableReplicaNodePort }}
+  enableMasterPoolerNodePort: {{ .Values.enableMasterPoolerNodePort }}
+  enableReplicaPoolerNodePort: {{ .Values.enableReplicaPoolerNodePort }}
+{{- if .Values.masterNodePort }}
+  masterNodePort: {{ .Values.masterNodePort }}
+{{- end }}
+{{- if .Values.replicaNodePort }}
+  replicaNodePort: {{ .Values.replicaNodePort }}
+{{- end }}
+{{- if .Values.masterPoolerNodePort }}
+  masterPoolerNodePort: {{ .Values.masterPoolerNodePort }}
+{{- end }}
+{{- if .Values.replicaPoolerNodePort }}
+  replicaPoolerNodePort: {{ .Values.replicaPoolerNodePort }}
+{{- end }}
+
 {{- if .Values.allowedSourceRanges }}
   allowedSourceRanges:
     {{- toYaml .Values.allowedSourceRanges | nindent 4 }}
@@ -49,10 +66,18 @@ spec:
     {{- toYaml .Values.env | nindent 4 }}
 {{- end }}
 
+{{- if .Values.envFrom }}
+  envFrom:
+    {{- toYaml .Values.envFrom | nindent 4 }}
+{{- end }}
+
   volume:
     size: {{ .Values.volume.size }}
 {{- if .Values.volume.storageClass }}
     storageClass: {{ .Values.volume.storageClass }}
+{{- end }}
+{{- if .Values.volume.type }}
+    type: {{ .Values.volume.type }}
 {{- end }}
 {{- if .Values.volume.iops }}
     iops: {{ .Values.volume.iops }}
@@ -132,4 +157,19 @@ spec:
 {{- if .Values.nodeAffinity }}
   nodeAffinity:
     {{- toYaml .Values.nodeAffinity | nindent 4 }}
+{{- end }}
+
+{{- if .Values.topologySpreadConstraints }}
+  topologySpreadConstraints:
+    {{- toYaml .Values.topologySpreadConstraints | nindent 4 }}
+{{- end }}
+
+{{- if .Values.livenessProbe }}
+  livenessProbe:
+    {{- toYaml .Values.livenessProbe | nindent 4 }}
+{{- end }}
+
+{{- if .Values.standby }}
+  standby:
+    {{- toYaml .Values.standby | nindent 4 }}
 {{- end }}
