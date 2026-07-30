@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.2.1](https://github.com/plopoyop/postgresql-kubernetes-resources/tree/0.2.1) (2026-07-30)
+
+[Full Changelog](https://github.com/plopoyop/postgresql-kubernetes-resources/compare/0.2.0...0.2.1)
+
+## ⚙️ Dependencies
+
+- fix\(ci\): update renovatebot/github-action action \(v46.1.20 → v46.1.21\) [\#45](https://github.com/plopoyop/postgresql-kubernetes-resources/pull/45) ([plopoyop](https://github.com/plopoyop))
+
 ## [0.2.0](https://github.com/plopoyop/postgresql-kubernetes-resources/tree/0.2.0) (2026-07-29)
 
 [Full Changelog](https://github.com/plopoyop/postgresql-kubernetes-resources/compare/0.1.1...0.2.0)
