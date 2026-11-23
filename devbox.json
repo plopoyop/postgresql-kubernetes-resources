@@ -3,7 +3,7 @@
     "packages": [
       "git@2.56.0",
       "go-task@3.53.1",
-      "kubernetes-helm@3.20.2",
+      "kubernetes-helm@4.3.2",
       "prek@0.5.10",
       "yq@3.4.3"
     ],
